@@ -1,0 +1,12 @@
+pbkdf2
+pycryptodome
+scrypt
+werkzeug
+json-rpc
+requests
+lru-dict
+secp256k1
+bitcoin
+eth_utils
+click
+rlp==0.6.0
