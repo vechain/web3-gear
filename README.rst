@@ -29,8 +29,8 @@ This will run web3-gear on 127.0.0.1:8545.
 
 You can change its default behavior with the following parameters:
 
-- host, rpc service host, default=127.0.0.1
-- port, rpc service port default=8545
-- endpoint, thor restful service endpoint, default=http://127.0.0.1:8669
-- keystore, keystore file path (eg: /Users/(username)/keystore), default=thor stand-alone(solo) built-in accounts
-- passcode, passcode of keystore
+- ``--host`` : rpc service host, eg: ``--host 127.0.0.1``
+- ``--port`` : rpc service port, eg: ``--port 8545``
+- ``--endpoint`` : thor restful service endpoint, eg: ``--endpoint http://127.0.0.1:8669``
+- ``--keystore`` : keystore file path, eg: ``--keystore /Users/(username)/keystore)``, default=thor stand-alone(solo) built-in accounts
+- ``--passcode`` : passcode of keystore, eg: ``--passcode xxxxxxxx``
