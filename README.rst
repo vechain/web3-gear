@@ -1,4 +1,4 @@
-Give thor a RPC-API like Ehereum, now it's mainly to be able to use Remix on `Thor <https://github.com/vechain/thor>`_.
+Give thor a RPC-API like Ethereum, now it's mainly to be able to use Remix on `Thor <https://github.com/vechain/thor>`_.
 
 Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts>`_ will make Web3-Gear more usable.
 
