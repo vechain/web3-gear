@@ -1,3 +1,8 @@
+Web3-gear 
+--------------------
+.. image:: https://badges.gitter.im/vechain/thor.svg
+    :alt: Gitter
+    :target: https://gitter.im/vechain/thor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 Give thor a RPC-API like Ethereum, now it's mainly to be able to use Remix on `Thor <https://github.com/vechain/thor>`_.
 
 Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts>`_ will make Web3-Gear more usable.
