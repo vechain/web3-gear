@@ -86,7 +86,10 @@ def make_request(endpoint_uri, method, params=None, data=None, **kwargs):
     try:
         response = method(endpoint_uri, params=params, data=data, **kwargs)
         response.raise_for_status()
+        return json.loads(response.content)
     except requests.exceptions.ConnectionError:
         print("Unable to connect to Thor-Restful server.")
-        return None
-    return json.loads(response.content)
+    except requests.RequestException as e:
+        print("Thor-Restful server Err:", e)
+        print(response.content)
+    return None
