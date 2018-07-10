@@ -42,7 +42,7 @@ Use Remix
 
 Change the Remix environment to Web3 provide.
 
-.. image:: http://oi64.tinypic.com/5tw5kg.jpg
+.. image:: http://oi64.tinypic.com/2u59gef.jpg
 
 Use Truffle
 ^^^^^^^^^^^
