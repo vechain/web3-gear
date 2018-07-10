@@ -1,13 +1,16 @@
 import sys
 import json
+import uuid
 import logging
 import traceback
+import itertools
 from .thor.client import thor
 from .utils.compat import noop
 from .utils.types import (
     normalize_number,
     normalize_block_identifier,
     force_obj_to_text,
+    encode_number,
 )
 from jsonrpc import (
     JSONRPCResponseManager,
@@ -41,23 +44,29 @@ def input_transaction_formatter(transaction):
     }
 
 
-FILTER_KWARGS_MAP = {
-    'fromBlock': 'from_block',
-    'toBlock': 'to_block',
-}
-
-
-FILTER_FORMATTERS = {
-    'fromBlock': normalize_block_identifier,
-    'toBlock': normalize_block_identifier,
-}
-
-
-def input_filter_params_formatter(filter_params):
+def input_log_filter_formatter(filter_params):
+    params_range = {"unit": "block"}
+    params_range["from"] = int(filter_params["fromBlock"], 16)
+    to_blk = filter_params.get("toBlock", None)
+    if to_blk:
+        params_range["to"] = int(to_blk, 16)
     return {
-        FILTER_KWARGS_MAP.get(k, k): FILTER_FORMATTERS.get(k, noop)(v)
-        for k, v in filter_params.items()
+        "range": params_range,
+        "topicSets": topics_formatter(filter_params.get("topics", []))
     }
+
+
+def topics_formatter(eth_topics):
+    if eth_topics:
+        matrix = [x if isinstance(x, list) else [x] for x in eth_topics]
+        return [
+            {
+                "topic{}".format(index): topic
+                for index, topic in enumerate(e)
+            }
+            for e in itertools.product(*matrix)
+        ]
+    return []
 
 
 #
@@ -98,6 +107,21 @@ def net_version():
 @dispatcher.add_method
 def net_listening():
     return False
+
+
+#
+# evm_api
+# 没有真实实现, 只是为了实现接口
+#
+
+@dispatcher.add_method
+def evm_snapshot():
+    return encode_number(0)
+
+
+@dispatcher.add_method
+def evm_revert(snapshot_idx=None):
+    return True
 
 
 #
@@ -199,6 +223,35 @@ def eth_getBlockByNumber(block_number, full_tx=True):
     '''
     logger.info('eth_getBlockByNumber')
     return thor.get_block(normalize_block_identifier(block_number))
+
+
+@dispatcher.add_method
+def eth_newBlockFilter():
+    logger.info('eth_newBlockFilter')
+    filter_id = uuid.uuid1().__str__()
+    current = thor.get_block_number()
+    thor.filter[filter_id] = lambda: thor.get_blocks_after_num(current)
+    return filter_id
+
+
+@dispatcher.add_method
+def eth_uninstallFilter(filter_id):
+    logger.info('eth_uninstallFilter')
+    del thor.filter[filter_id]
+    return None
+
+
+@dispatcher.add_method
+def eth_getFilterChanges(filter_id):
+    logger.info('eth_getFilterChanges')
+    filter_func = thor.filter.get(filter_id, lambda: None)
+    return filter_func()
+
+
+@dispatcher.add_method
+def eth_getLogs(filter_obj):
+    logger.info('eth_getLogs')
+    return thor.get_logs(filter_obj.get("address", None), input_log_filter_formatter(filter_obj))
 
 
 @Request.application

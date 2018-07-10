@@ -62,7 +62,7 @@ def thor_receipt_convert_to_eth_receipt(receipt):
         "gasUsed": encode_number(receipt["gasUsed"]),
         "contractAddress": None if receipt["reverted"] else receipt["outputs"][0]["contractAddress"],
         "logs": None if receipt["reverted"] else [
-            thor_log_convert_to_eth_log(receipt, index, log)
+            thor_receipt_log_convert_to_eth_log(receipt, index, log)
             for index, log in enumerate(receipt["outputs"][0]["events"])
         ],
     }
@@ -71,7 +71,7 @@ def thor_receipt_convert_to_eth_receipt(receipt):
 #
 # log
 #
-def thor_log_convert_to_eth_log(receipt, index, log):
+def thor_receipt_log_convert_to_eth_log(receipt, index, log):
     return {
         "type": "mined",
         "logIndex": encode_number(index),
@@ -83,6 +83,24 @@ def thor_log_convert_to_eth_log(receipt, index, log):
         "data": log["data"],
         "topics": log["topics"],
     }
+
+
+def thor_log_convert_to_eth_log(address, logs):
+    if logs:
+        return [
+            {
+                "logIndex": encode_number(index),
+                "blockNumber": encode_number(log["meta"]["blockNumber"]),
+                "blockHash": log["meta"]["blockID"],
+                "transactionHash": log["meta"]["txID"],
+                "transactionIndex": encode_number(0),
+                "address": address,
+                "data": log["data"],
+                "topics": log["topics"],
+            }
+            for index, log in enumerate(logs)
+        ]
+    return []
 
 
 #
@@ -133,8 +151,14 @@ class ThorTransaction(rlp.Serializable):
         chain_tag = int(thor.get_block(0)["hash"][-2:], 16)
         blk_ref = int(strip_0x(thor.get_block("best")["hash"])[:8], 16)
         receiver = b"" if "to" not in eth_tx else decode_hex(eth_tx["to"])
-        clauses = [Clause(receiver, eth_tx["value"], decode_hex(eth_tx["data"]))]
-        super(ThorTransaction, self).__init__(chain_tag, blk_ref, (2 ** 32)-1, clauses, 0, eth_tx["gas"], b"", 0, [], b"")
+        clauses = [
+            Clause(
+                receiver,
+                eth_tx.get("value", 0),
+                decode_hex(eth_tx.get("data", "")),
+            )
+        ]
+        super(ThorTransaction, self).__init__(chain_tag, blk_ref, (2 ** 32) - 1, clauses, 0, eth_tx.get("gas", 3000000), b"", 0, [], b"")
 
     def sign(self, key):
         '''Sign this transaction with a private key.

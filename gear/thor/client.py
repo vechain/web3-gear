@@ -9,6 +9,7 @@ from gear.utils.compat import (
     thor_block_convert_to_eth_block,
     thor_receipt_convert_to_eth_receipt,
     thor_tx_convert_to_eth_tx,
+    thor_log_convert_to_eth_log,
     ThorTransaction,
     intrinsic_gas,
 )
@@ -28,6 +29,8 @@ class ThorClient(object, metaclass=Singleton):
         self.transaction = lambda id: make_request("{0}/transactions/{1}".format(self.endpoint, id)) if id else make_request("{0}/transactions".format(self.endpoint))
         self.receipt = lambda id: make_request("{0}/transactions/{1}/receipt".format(self.endpoint, id))
         self.trace = lambda id: make_request("{0}/transactions/{1}/trace".format(self.endpoint, id))
+        self.events = lambda: make_request("{0}/events".format(self.endpoint))
+        self.filter = {}
 
     def set_endpoint(self, endpoint):
         self.endpoint = endpoint
@@ -55,6 +58,10 @@ class ThorClient(object, metaclass=Singleton):
         block = self.block("best")(get)
         return None if block is None else block["number"]
 
+    def get_block_id(self, block_identifier):
+        blk = self.block(block_identifier)(get)
+        return None if blk is None else blk["id"]
+
     def estimate_gas(self, transaction):
         if "to" not in transaction:
             to_addr = None
@@ -62,7 +69,7 @@ class ThorClient(object, metaclass=Singleton):
             to_addr = transaction["to"]
         data = {
             "data": transaction["data"],
-            "value": (encode_number(transaction["value"])).decode("utf-8"),
+            "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
             "caller": transaction["from"],
         }
         result = self.account(to_addr)(post, data=data)
@@ -71,18 +78,14 @@ class ThorClient(object, metaclass=Singleton):
         return encode_number(int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction))
 
     def call(self, transaction, block_identifier):
-        if "to" not in transaction:
-            to_addr = None
-        else:
-            to_addr = transaction["to"]
         params = {
             "revision": block_identifier,
         }
         data = {
             "data": transaction["data"],
-            "value": (encode_number(transaction["value"])).decode("utf-8"),
+            "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
         }
-        result = self.account(to_addr)(post, data=data, params=params)
+        result = self.account(transaction.get("to", None))(post, data=data, params=params)
         return None if result is None else result["data"]
 
     def send_transaction(self, transaction):
@@ -113,12 +116,35 @@ class ThorClient(object, metaclass=Singleton):
         blk = self.block(block_identifier)(get)
         return None if blk is None else thor_block_convert_to_eth_block(blk)
 
+    def get_blocks_after_num(self, block_num):
+        """获取 num 之后的所有 blocks
+
+        Arguments:
+            block_num {int} -- block number
+        """
+        best_num = self.get_block_number()
+        if best_num is None:
+            return None
+        return [
+            id
+            for id in map(self.get_block_id, range(block_num, best_num + 1))
+            if id is not None
+        ]
+
     def get_code(self, address, block_identifier):
         params = {
             "revision": block_identifier
         }
         code = self.code(address)(get, params=params)
         return None if code is None else code["code"]
+
+    def get_logs(self, address, query):
+        params = {
+            "address": address
+        }
+        logs = self.events()(post, data=query, params=params)
+        result = thor_log_convert_to_eth_log(address, logs)
+        return result
 
 
 thor = ThorClient()
