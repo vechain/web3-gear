@@ -1,5 +1,5 @@
 Web3-gear
---------------------
+---------
 
 .. image:: https://badges.gitter.im/vechain/thor.svg
     :alt: Gitter
@@ -12,24 +12,18 @@ Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts
 Installation on OS X
 --------------------
 
-First install the system-dependecies for a successful build of secp256k1-py:
-
-::
+First install the system-dependecies for a successful build of secp256k1-py::
 
     brew install automake libtool pkg-config libffi gmp openssl
 
-Installation of Web3-Gear and it's dependent Python packages via PyPI:
-
-::
+Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
     pip3 install web3-gear
 
 Run
 ---
 
-Installing through pip will make the ``web3-gear`` command available on your machine (`must run thor client first.`):
-
-::
+Installing through pip will make the ``web3-gear`` command available on your machine (`must run thor client first.`)::
 
     web3-gear
 
@@ -55,7 +49,8 @@ Use Truffle
 
 Modify the configuration of truffle first(``truffle.js``):
 
-::
+.. code-block:: js
+
     module.exports = {
       networks: {
         development: {
