@@ -1,6 +1,5 @@
 import sys
 import json
-import uuid
 import logging
 import traceback
 import itertools
@@ -228,24 +227,19 @@ def eth_getBlockByNumber(block_number, full_tx=True):
 @dispatcher.add_method
 def eth_newBlockFilter():
     logger.info('eth_newBlockFilter')
-    filter_id = uuid.uuid1().__str__()
-    current = thor.get_block_number()
-    thor.filter[filter_id] = lambda: thor.get_blocks_after_num(current)
-    return filter_id
+    return thor.new_block_filter()
 
 
 @dispatcher.add_method
 def eth_uninstallFilter(filter_id):
     logger.info('eth_uninstallFilter')
-    del thor.filter[filter_id]
-    return None
+    return thor.uninstall_filter(filter_id)
 
 
 @dispatcher.add_method
 def eth_getFilterChanges(filter_id):
     logger.info('eth_getFilterChanges')
-    filter_func = thor.filter.get(filter_id, lambda: None)
-    return filter_func()
+    return thor.get_filter_changes(filter_id)
 
 
 @dispatcher.add_method
