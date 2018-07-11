@@ -20,9 +20,9 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 release: clean
-	python setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
 	twine upload -r pypi dist/*
 
 sdist: clean
-	python setup.py sdist bdist_wheel
+	python3 setup.py sdist bdist_wheel
 	ls -l dist
