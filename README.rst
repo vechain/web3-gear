@@ -7,7 +7,7 @@ Web3-gear
 
 Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more.
 
-Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts>`_ will make Web3-Gear more usable.
+Working with `Thor Builtins <https://github.com/vechain/thor-builtins>`_ will make Web3-Gear more usable.
 
 Installation on OS X
 --------------------
