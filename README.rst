@@ -5,7 +5,7 @@ Web3-gear
     :alt: Gitter
     :target: https://gitter.im/vechain/thor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to web3-RPC, to support Remix, Truffle and more.
+Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more.
 
 Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts>`_ will make Web3-Gear more usable.
 
