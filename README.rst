@@ -5,7 +5,7 @@ Web3-gear
     :alt: Gitter
     :target: https://gitter.im/vechain/thor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-Give thor a RPC-API like Ethereum, now it's mainly to be able to use Remix & Truffle on `Thor <https://github.com/vechain/thor>`_.
+Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to web3-RPC, to support Remix, Truffle and more.
 
 Working with `builtin-contracts <https://github.com/z351522453/builtin-contracts>`_ will make Web3-Gear more usable.
 
@@ -42,7 +42,7 @@ Use Remix
 
 Change the Remix environment to Web3 provide.
 
-.. image:: http://oi64.tinypic.com/5tw5kg.jpg
+.. image:: http://oi64.tinypic.com/2u59gef.jpg
 
 Use Truffle
 ^^^^^^^^^^^

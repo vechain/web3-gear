@@ -1,4 +1,5 @@
 import rlp
+import uuid
 from gear.utils.singleton import Singleton
 from gear.utils.types import (
     encode_number,
@@ -22,13 +23,16 @@ from .request import (
 
 class ThorClient(object, metaclass=Singleton):
     def __init__(self):
-        self.block = lambda revision: make_request("{0}/blocks/{1}".format(self.endpoint, revision))
-        self.account = lambda address: make_request("{0}/accounts/{1}".format(self.endpoint, address)) if address else make_request("{0}/accounts".format(self.endpoint))
-        self.storage = lambda address, position: make_request("{0}/accounts/{1}/storage/{2}".format(self.endpoint, address, position))
-        self.code = lambda address: make_request("{0}/accounts/{1}/code".format(self.endpoint, address))
-        self.transaction = lambda id: make_request("{0}/transactions/{1}".format(self.endpoint, id)) if id else make_request("{0}/transactions".format(self.endpoint))
+        self.account = lambda address: make_request("{0}/accounts/{1}".format(self.endpoint, address))\
+            if address else\
+            make_request("{0}/accounts".format(self.endpoint))
+        self.transaction = lambda id: make_request("{0}/transactions/{1}".format(self.endpoint, id)) \
+            if id else \
+            make_request("{0}/transactions".format(self.endpoint))
         self.receipt = lambda id: make_request("{0}/transactions/{1}/receipt".format(self.endpoint, id))
+        self.code = lambda address: make_request("{0}/accounts/{1}/code".format(self.endpoint, address))
         self.trace = lambda id: make_request("{0}/transactions/{1}/trace".format(self.endpoint, id))
+        self.block = lambda revision: make_request("{0}/blocks/{1}".format(self.endpoint, revision))
         self.events = lambda: make_request("{0}/events".format(self.endpoint))
         self.filter = {}
 
@@ -39,7 +43,8 @@ class ThorClient(object, metaclass=Singleton):
         self.account_manager = account_manager
 
     def trace_transaction(self, tx_hash, params):
-        del params["fullStorage"]
+        if "fullStorage" in params:  # this option is not supported in thor.
+            del params["fullStorage"]
         data = {
             "logConfig": params,
         }
@@ -49,7 +54,7 @@ class ThorClient(object, metaclass=Singleton):
         '''
         TODO
         '''
-        return None
+        raise Exception("Did not implement this interface.")
 
     def get_accounts(self):
         return self.account_manager.get_accounts()
@@ -116,21 +121,6 @@ class ThorClient(object, metaclass=Singleton):
         blk = self.block(block_identifier)(get)
         return None if blk is None else thor_block_convert_to_eth_block(blk)
 
-    def get_blocks_after_num(self, block_num):
-        """获取 num 之后的所有 blocks
-
-        Arguments:
-            block_num {int} -- block number
-        """
-        best_num = self.get_block_number()
-        if best_num is None:
-            return None
-        return [
-            id
-            for id in map(self.get_block_id, range(block_num, best_num + 1))
-            if id is not None
-        ]
-
     def get_code(self, address, block_identifier):
         params = {
             "revision": block_identifier
@@ -138,12 +128,46 @@ class ThorClient(object, metaclass=Singleton):
         code = self.code(address)(get, params=params)
         return None if code is None else code["code"]
 
+    def new_block_filter(self):
+        filter_id = uuid.uuid1().__str__()
+        self.filter[filter_id] = BlockFilter(self)
+        return filter_id
+
+    def uninstall_filter(self, filter_id):
+        if filter_id in self.filter:
+            del self.filter[filter_id]
+        return True
+
+    def get_filter_changes(self, filter_id):
+        func = self.filter.get(filter_id, lambda: [])
+        return func()
+
     def get_logs(self, address, query):
         params = {
             "address": address
         }
         logs = self.events()(post, data=query, params=params)
         result = thor_log_convert_to_eth_log(address, logs)
+        return result
+
+
+class BlockFilter(object):
+
+    def __init__(self, client):
+        super(BlockFilter, self).__init__()
+        self.current = client.get_block_number()
+        self.client = client
+
+    def __call__(self):
+        result = []
+        best_num = self.client.get_block_number()
+        if best_num:
+            result = [
+                id
+                for id in map(self.client.get_block_id, range(self.current, best_num + 1))
+                if id is not None
+            ]
+            self.current = best_num
         return result
 
 
