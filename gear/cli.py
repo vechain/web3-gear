@@ -51,7 +51,7 @@ class SilentWSGIRequestHandler(WSGIRequestHandler):
 )
 def run_server(host, port, endpoint, keystore, passcode):
     try:
-        response = requests.options("http://127.0.0.1:8669/")
+        response = requests.options(endpoint)
         response.raise_for_status()
     except requests.exceptions.ConnectionError:
         print("Unable to connect to Thor-Restful server.")
