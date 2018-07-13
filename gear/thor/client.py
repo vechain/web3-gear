@@ -58,16 +58,12 @@ class ThorClient(object, metaclass=Singleton):
         return None if blk is None else blk["id"]
 
     def estimate_gas(self, transaction):
-        if "to" not in transaction:
-            to_addr = None
-        else:
-            to_addr = transaction["to"]
         data = {
             "data": transaction["data"],
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
             "caller": transaction["from"],
         }
-        result = self.accounts(to_addr).make_request(post, data=data)
+        result = self.accounts(transaction.get("to", None)).make_request(post, data=data)
         if result is None:
             return encode_number(0)
         return encode_number(int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction))
@@ -79,6 +75,7 @@ class ThorClient(object, metaclass=Singleton):
         data = {
             "data": transaction["data"],
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
+            "caller": transaction["from"],
         }
         result = self.accounts(transaction.get("to", None)).make_request(post, data=data, params=params)
         return None if result is None else result["data"]
