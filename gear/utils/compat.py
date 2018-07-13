@@ -168,13 +168,12 @@ class ThorTransaction(rlp.Serializable):
         if key in (0, "", b"\x00" * 32, "0" * 64):
             raise Exception("Zero privkey cannot sign")
 
+        if len(key) == 64:
+            key = encode_privkey(key, "bin")  # we need a binary key
+
         h = blake2b(digest_size=32)
         h.update(rlp.encode(self, ThorTransaction.exclude(["Signature"])))
         rawhash = h.digest()
-
-        if len(key) == 64:
-            # we need a binary key
-            key = encode_privkey(key, "bin")
 
         pk = PrivateKey(key, raw=True)
         signature = pk.ecdsa_recoverable_serialize(
