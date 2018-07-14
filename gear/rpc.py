@@ -153,7 +153,7 @@ def eth_getCode(address, block_identifier="best"):
 @dispatcher.add_method
 def eth_blockNumber():
     logger.info('eth_blockNumber')
-    return thor.get_block_number()
+    return encode_number(thor.get_block_number())
 
 
 @dispatcher.add_method

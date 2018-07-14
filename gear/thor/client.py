@@ -54,8 +54,8 @@ class ThorClient(object, metaclass=Singleton):
         return None if block is None else block["number"]
 
     def get_block_id(self, block_identifier):
-        blk = self.blocks(block_identifier).make_request(get)
-        return None if blk is None else blk["id"]
+        block = self.blocks(block_identifier).make_request(get)
+        return None if block is None else blk["id"]
 
     def estimate_gas(self, transaction):
         data = {
