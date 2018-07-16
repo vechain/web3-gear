@@ -151,10 +151,10 @@ class BlockFilter(object):
         if best_num:
             result = [
                 id
-                for id in map(self.client.get_block_id, range(self.current + 1, best_num + 1))
+                for id in map(self.client.get_block_id, range(self.current, best_num + 1))
                 if id is not None
             ]
-            self.current = best_num
+            self.current = best_num + 1
         return result
 
 
