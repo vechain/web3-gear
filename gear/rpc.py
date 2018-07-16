@@ -160,7 +160,7 @@ def eth_blockNumber():
 def eth_estimateGas(transaction):
     logger.info('eth_estimateGas')
     formatted_transaction = input_transaction_formatter(transaction)
-    return thor.estimate_gas(formatted_transaction)
+    return encode_number(thor.estimate_gas(formatted_transaction))
 
 
 @dispatcher.add_method
