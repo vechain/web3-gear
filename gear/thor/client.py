@@ -65,8 +65,8 @@ class ThorClient(object, metaclass=Singleton):
         }
         result = self.accounts(transaction.get("to", None)).make_request(post, data=data)
         if result is None:
-            return encode_number(0)
-        return encode_number(int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction))
+            return 0
+        return int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction)
 
     def call(self, transaction, block_identifier):
         params = {
