@@ -207,22 +207,22 @@ def eth_getTransactionReceipt(tx_hash):
 
 
 @dispatcher.add_method
-def eth_getBlockByHash(block_hash, full_tx=True):
-    '''
-    full_tx 该参数仅为了与以太坊兼容, thor 中无用
-    '''
+def eth_getBlockByHash(block_hash, full_tx=False):
     logger.info('eth_getBlockByHash')
-    return thor.get_block(normalize_block_identifier(block_hash))
+    return get_block(block_hash, full_tx)
 
 
 @dispatcher.add_method
-def eth_getBlockByNumber(block_number, full_tx=True):
-    '''
-    full_tx 该参数仅为了与以太坊兼容, thor 中无用
-    '''
+def eth_getBlockByNumber(block_number, full_tx=False):
     logger.info('eth_getBlockByNumber')
-    return thor.get_block(normalize_block_identifier(block_number))
+    return get_block(block_number, full_tx)
 
+
+def get_block(block_identifier, full_tx):
+    blk = thor.get_block(normalize_block_identifier(block_identifier))
+    if blk and full_tx:
+        blk["transactions"] = [eth_getTransactionByHash(tx) for tx in blk["transactions"]]
+    return blk
 
 @dispatcher.add_method
 def eth_newBlockFilter():
