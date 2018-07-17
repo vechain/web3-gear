@@ -16,7 +16,7 @@ setup(
     version="1.0.7",
     description="An adapter between thor-restful and eth-rpc.",
     long_description=long_description,
-    url="https://github.com/z351522453/web3-gear",
+    url="https://github.com/vechain/web3-gear",
     author="Han Xiao",
     author_email="smallcpp@foxmail.com",
     license="MIT",
