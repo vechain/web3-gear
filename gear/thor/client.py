@@ -1,5 +1,5 @@
 import rlp
-import random
+import uuid
 from gear.utils.singleton import Singleton
 from gear.utils.types import (
     encode_number,
@@ -116,7 +116,7 @@ class ThorClient(object, metaclass=Singleton):
         return None if code is None else code["code"]
 
     def new_block_filter(self):
-        filter_id = '0x' + '%030x' % random.randrange(16**32)
+        filter_id = "0x{}".format(uuid.uuid4().hex)
         self.filter[filter_id] = BlockFilter(self)
         return filter_id
 
