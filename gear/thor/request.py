@@ -12,8 +12,8 @@ from eth_utils import (
     is_text,
     to_bytes,
 )
+from jsonrpc.exceptions import JSONRPCDispatchException
 from collections import Generator
-from cytoolz import curry
 
 
 def _generate_cache_key(value):
@@ -105,4 +105,5 @@ class Restful(object):
         except requests.RequestException as e:
             print("Thor-Restful server Err:", e)
             print(response.content)
+            raise JSONRPCDispatchException(-32000, message=response.content.decode().strip('\n'))
         return None
