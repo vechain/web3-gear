@@ -12,19 +12,18 @@ Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, t
 
 Working with `Thor Builtins <https://github.com/vechain/thor-builtins>`_ will make Web3-Gear more usable.
 
-Installation on OS X
---------------------
+Quick Start
+-----------
 
-First install the system-dependecies for a successful build of secp256k1-py::
-
-    brew install automake libtool pkg-config libffi gmp openssl
+Installation
+>>>>>>>>>>>>
 
 Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
     pip3 install web3-gear
 
 Run
----
+>>>
 
 Installing through pip will make the ``web3-gear`` command available on your machine (`must run thor client first.`)::
 
@@ -41,35 +40,33 @@ You can change its default behavior with the following parameters:
 --passcode  passcode of keystore, eg: ``--passcode xxxxxxxx``
 
 Use Remix
-^^^^^^^^^
+>>>>>>>>>
 
 Change the Remix environment to Web3 provide.
 
 .. image:: http://oi64.tinypic.com/2u59gef.jpg
 
 Use Truffle
-^^^^^^^^^^^
+>>>>>>>>>>>
 
 Modify the configuration of truffle first(``truffle.js``):
 
 .. code-block:: js
 
     module.exports = {
-      networks: {
-        development: {
-          host: "localhost",
-          port: 8545,
-          network_id: "*" // Match any network id
+        networks: {
+            development: {
+                host: "localhost",
+                port: 8545,
+                network_id: "*" // Match any network id
+            }
         }
-      }
     };
 
 Then you can use truffle's command line tool.
 
 There are some projects based on truffle, can use them for testing:
 
-`Crowdsale Contracts <https://github.com/vechain/crowdsale-contracts>`_.
-
-`Token Distribution <https://github.com/libotony/token-distribution>`_.
-
-`Solidity Idiosyncrasies <https://github.com/miguelmota/solidity-idiosyncrasies>`_.
+- `Crowdsale Contracts <https://github.com/vechain/crowdsale-contracts>`_.
+- `Token Distribution <https://github.com/libotony/token-distribution>`_.
+- `Solidity Idiosyncrasies <https://github.com/miguelmota/solidity-idiosyncrasies>`_.

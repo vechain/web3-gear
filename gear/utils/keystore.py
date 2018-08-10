@@ -1,7 +1,8 @@
 import os
 import pbkdf2
 import scrypt
-import bitcoin
+from eth_keys import keys
+from eth_utils import to_bytes
 from Crypto.Cipher import AES
 from Crypto.Util import Counter
 from Crypto.Hash import (
@@ -103,9 +104,9 @@ def sha3(seed):
 
 
 def priv_to_addr(x):
-    if len(x) > 32:
-        x = decode_hex(x)
-    return add_0x(encode_hex(sha3(bitcoin.privtopub(x)[1:])[12:]))
+    if len(x) == 64:
+        key = to_bytes(hexstr=x)  # we need a binary key
+    return keys.PrivateKey(key).public_key.to_address()
 
 
 def decode_keystore_json(jsondata, pw):

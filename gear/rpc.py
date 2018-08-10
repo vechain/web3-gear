@@ -1,24 +1,19 @@
-import sys
+import itertools
 import json
 import logging
+import sys
 import traceback
-import itertools
+from jsonrpc import JSONRPCResponseManager, dispatcher
+from werkzeug.wrappers import Request, Response
 from .thor.client import thor
 from .utils.compat import noop
 from .utils.types import (
-    normalize_number,
-    normalize_block_identifier,
-    force_obj_to_text,
     encode_number,
+    force_obj_to_text,
+    normalize_block_identifier,
+    normalize_number
 )
-from jsonrpc import (
-    JSONRPCResponseManager,
-    dispatcher,
-)
-from werkzeug.wrappers import (
-    Request,
-    Response,
-)
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -223,6 +218,7 @@ def get_block(block_identifier, full_tx):
     if blk and full_tx:
         blk["transactions"] = [eth_getTransactionByHash(tx) for tx in blk["transactions"]]
     return blk
+
 
 @dispatcher.add_method
 def eth_newBlockFilter():
