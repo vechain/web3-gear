@@ -3,8 +3,7 @@ import uuid
 from gear.utils.singleton import Singleton
 from gear.utils.types import (
     encode_number,
-    encode_hex,
-    force_obj_to_bytes,
+    encode_hex
 )
 from gear.utils.compat import (
     thor_block_convert_to_eth_block,
@@ -82,7 +81,7 @@ class ThorClient(object, metaclass=Singleton):
 
     def send_transaction(self, transaction):
         tx = ThorTransaction(self, transaction)
-        tx.sign(self.account_manager.get_priv_by_addr(force_obj_to_bytes(transaction["from"])))
+        tx.sign(self.account_manager.get_priv_by_addr(transaction["from"]))
         data = {
             "raw": "0x{}".format(encode_hex(rlp.encode(tx)))
         }

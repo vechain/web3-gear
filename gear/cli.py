@@ -2,12 +2,12 @@ import time
 import click
 import random
 import requests
+from .utils.thread import spawn
 from .thor.client import thor
 from .thor.account import (
     solo,
     keystore as _keystore,
 )
-from .utils.thread import spawn
 from .rpc import (
     application,
     web3_clientVersion,

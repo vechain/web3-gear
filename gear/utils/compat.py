@@ -1,17 +1,17 @@
 import rlp
-from bitcoin import encode_privkey
-from secp256k1 import PrivateKey
 from hashlib import blake2b
-from .types import (
-    strip_0x,
-    encode_number,
-    decode_hex,
-    bytearray_to_bytestr,
-)
+from eth_keys import keys
+from eth_utils import to_bytes
 from rlp.sedes import (
-    big_endian_int,
     CountableList,
-    binary,
+    big_endian_int,
+    binary
+)
+from .types import (
+    bytearray_to_bytestr,
+    decode_hex,
+    encode_number,
+    strip_0x
 )
 
 
@@ -165,21 +165,18 @@ class ThorTransaction(rlp.Serializable):
 
         A potentially already existing signature would be overridden.
         '''
-        if key in (0, "", b"\x00" * 32, "0" * 64):
-            raise Exception("Zero privkey cannot sign")
-
-        if len(key) == 64:
-            key = encode_privkey(key, "bin")  # we need a binary key
-
         h = blake2b(digest_size=32)
         h.update(rlp.encode(self, ThorTransaction.exclude(["Signature"])))
         rawhash = h.digest()
 
-        pk = PrivateKey(key, raw=True)
-        signature = pk.ecdsa_recoverable_serialize(
-            pk.ecdsa_sign_recoverable(rawhash, raw=True)
-        )
-        self.Signature = signature[0] + bytearray_to_bytestr([signature[1]])
+        if key in (0, "", b"\x00" * 32, "0" * 64):
+            raise Exception("Zero privkey cannot sign")
+
+        if len(key) == 64:
+            key = to_bytes(hexstr=key)  # we need a binary key
+        pk = keys.PrivateKey(key)
+
+        self.Signature = pk.sign_msg_hash(rawhash).to_bytes()
 
 
 #

@@ -5,26 +5,44 @@ Web3-gear
     :alt: Gitter
     :target: https://gitter.im/vechain/thor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more.
-
-* Python 3.6+ support
-* Truffle 4.0.6+ support
+Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more (You should give priority to using Thor's RESTful API).
 
 Working with `Thor Builtins <https://github.com/vechain/thor-builtins>`_ will make Web3-Gear more usable.
 
-Installation on OS X
---------------------
+Quick Start
+-----------
 
-First install the system-dependecies for a successful build of secp256k1-py::
+Installation
+>>>>>>>>>>>>
 
-    brew install automake libtool pkg-config libffi gmp openssl
+On OS x
+:::::::
 
-Installation of Web3-Gear and it's dependent Python packages via PyPI::
+* Python 3.6+ support
+
+1. Install the system-dependecies::
+
+    brew install openssl
+
+2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
+
+    pip3 install web3-gear
+
+On Window
+:::::::::
+
+* Python 3.6 support
+
+1. Install Visual C++ Build Tools.
+
+2. Install `scrypt-py <https://pypi.org/project/scrypt/#files>`_ use the precompiled wheels.
+
+3. Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
     pip3 install web3-gear
 
 Run
----
+>>>
 
 Installing through pip will make the ``web3-gear`` command available on your machine (`must run thor client first.`)::
 
@@ -41,35 +59,35 @@ You can change its default behavior with the following parameters:
 --passcode  passcode of keystore, eg: ``--passcode xxxxxxxx``
 
 Use Remix
-^^^^^^^^^
+>>>>>>>>>
 
 Change the Remix environment to Web3 provide.
 
 .. image:: http://oi64.tinypic.com/2u59gef.jpg
 
 Use Truffle
-^^^^^^^^^^^
+>>>>>>>>>>>
+
+* Truffle 4.0.6+ support
 
 Modify the configuration of truffle first(``truffle.js``):
 
 .. code-block:: js
 
     module.exports = {
-      networks: {
-        development: {
-          host: "localhost",
-          port: 8545,
-          network_id: "*" // Match any network id
+        networks: {
+            development: {
+                host: "localhost",
+                port: 8545,
+                network_id: "*" // Match any network id
+            }
         }
-      }
     };
 
 Then you can use truffle's command line tool.
 
 There are some projects based on truffle, can use them for testing:
 
-`Crowdsale Contracts <https://github.com/vechain/crowdsale-contracts>`_.
-
-`Token Distribution <https://github.com/libotony/token-distribution>`_.
-
-`Solidity Idiosyncrasies <https://github.com/miguelmota/solidity-idiosyncrasies>`_.
+- `Crowdsale Contracts <https://github.com/vechain/crowdsale-contracts>`_.
+- `Token Distribution <https://github.com/libotony/token-distribution>`_.
+- `Solidity Idiosyncrasies <https://github.com/miguelmota/solidity-idiosyncrasies>`_.
