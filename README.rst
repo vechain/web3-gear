@@ -5,10 +5,7 @@ Web3-gear
     :alt: Gitter
     :target: https://gitter.im/vechain/thor?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
 
-Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more.
-
-* Python 3.6+ support
-* Truffle 4.0.6+ support
+Proxy `Thor <https://github.com/vechain/thor>`_'s RESTful API to Eth JSON-RPC, to support Remix, Truffle and more (You should give priority to using Thor's RESTful API).
 
 Working with `Thor Builtins <https://github.com/vechain/thor-builtins>`_ will make Web3-Gear more usable.
 
@@ -18,7 +15,29 @@ Quick Start
 Installation
 >>>>>>>>>>>>
 
-Installation of Web3-Gear and it's dependent Python packages via PyPI::
+On OS x
+:::::::
+
+* Python 3.6+ support
+
+1. Install the system-dependecies::
+
+    brew install openssl
+
+2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
+
+    pip3 install web3-gear
+
+On Window
+:::::::::
+
+* Python 3.6 support
+
+1. Install Visual C++ Build Tools.
+
+2. Install `scrypt-py <https://pypi.org/project/scrypt/#files>`_ use the precompiled wheels.
+
+3. Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
     pip3 install web3-gear
 
@@ -48,6 +67,8 @@ Change the Remix environment to Web3 provide.
 
 Use Truffle
 >>>>>>>>>>>
+
+* Truffle 4.0.6+ support
 
 Modify the configuration of truffle first(``truffle.js``):
 
