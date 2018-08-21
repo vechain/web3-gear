@@ -60,7 +60,7 @@ class ThorClient(object, metaclass=Singleton):
         data = {
             "data": transaction["data"],
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
-            "caller": transaction["from"],
+            "caller": transaction.get("from", None),
         }
         result = self.accounts(transaction.get("to", None)).make_request(post, data=data)
         if result is None:
@@ -74,7 +74,7 @@ class ThorClient(object, metaclass=Singleton):
         data = {
             "data": transaction["data"],
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
-            "caller": transaction["from"],
+            "caller": transaction.get("from", None),
         }
         result = self.accounts(transaction.get("to", None)).make_request(post, data=data, params=params)
         return None if result is None else result["data"]
