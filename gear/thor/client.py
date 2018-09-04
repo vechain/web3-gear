@@ -20,6 +20,9 @@ from .request import (
 )
 
 
+def _attribute(obj, key): return None if obj is None else obj[key]
+
+
 class ThorClient(object, metaclass=Singleton):
     def __init__(self):
         self.filter = {}
@@ -49,12 +52,12 @@ class ThorClient(object, metaclass=Singleton):
         return self.account_manager.get_accounts()
 
     def get_block_number(self):
-        block = self.blocks("best").make_request(get)
-        return None if block is None else block["number"]
+        blk = self.blocks("best").make_request(get)
+        return _attribute(blk, "number")
 
     def get_block_id(self, block_identifier):
         blk = self.blocks(block_identifier).make_request(get)
-        return None if blk is None else blk["id"]
+        return _attribute(blk, "id")
 
     def estimate_gas(self, transaction):
         data = {
@@ -77,7 +80,7 @@ class ThorClient(object, metaclass=Singleton):
             "caller": transaction.get("from", None),
         }
         result = self.accounts(transaction.get("to", None)).make_request(post, data=data, params=params)
-        return None if result is None else result["data"]
+        return _attribute(result, "data")
 
     def send_transaction(self, transaction):
         tx = ThorTransaction(self, transaction)
@@ -86,7 +89,7 @@ class ThorClient(object, metaclass=Singleton):
             "raw": "0x{}".format(encode_hex(rlp.encode(tx)))
         }
         result = self.transactions.make_request(post, data=data)
-        return None if result is None else result["id"]
+        return _attribute(result, "id")
 
     def get_transaction_by_hash(self, tx_hash):
         tx = self.transactions(tx_hash).make_request(get)
@@ -97,7 +100,7 @@ class ThorClient(object, metaclass=Singleton):
             "revision": block_identifier
         }
         accout = self.accounts(address).make_request(get, params=params)
-        return None if accout is None else accout["balance"]
+        return _attribute(accout, "balance")
 
     def get_transaction_receipt(self, tx_hash):
         receipt = self.transactions(tx_hash).receipt.make_request(get)
@@ -112,7 +115,7 @@ class ThorClient(object, metaclass=Singleton):
             "revision": block_identifier
         }
         code = self.accounts(address).code.make_request(get, params=params)
-        return None if code is None else code["code"]
+        return _attribute(code, "code")
 
     def new_block_filter(self):
         filter_id = "0x{}".format(uuid.uuid4().hex)
