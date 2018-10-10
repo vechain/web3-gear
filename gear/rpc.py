@@ -81,7 +81,7 @@ def rpc_modules():
 @dispatcher.add_method
 def debug_traceTransaction(tx_hash, params):
     logger.info('debug_traceTransaction')
-    return thor.trace_transaction(tx_hash, params)
+    return thor.trace_transaction(tx_hash)
 
 
 @dispatcher.add_method
