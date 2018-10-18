@@ -48,8 +48,14 @@ class ThorClient(object, metaclass=Singleton):
         }
         return self.debug.tracers.make_request(post, data=data)
 
-    def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start):
-        raise Exception("Did not implement this interface.")
+    def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start, max_result):
+        data = {
+            "ContractAddress": contract_addr,
+            "KeyStart": key_start,
+            "MaxResult": max_result,
+            "target": "{}/{}/0".format(blk_hash, tx_index)
+        }
+        return self.debug.storage.make_request(post, data=data)
 
     def get_accounts(self):
         return self.account_manager.get_accounts()
