@@ -85,9 +85,9 @@ def debug_traceTransaction(tx_hash, params):
 
 
 @dispatcher.add_method
-def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start):
+def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_result):
     logger.info('debug_storageRangeAt')
-    return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start)
+    return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start, max_result)
 
 
 #

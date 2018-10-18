@@ -10,6 +10,7 @@ from gear.utils.compat import (
     thor_receipt_convert_to_eth_receipt,
     thor_tx_convert_to_eth_tx,
     thor_log_convert_to_eth_log,
+    thor_storage_convert_to_eth_storage,
     ThorTransaction,
     intrinsic_gas,
 )
@@ -55,7 +56,11 @@ class ThorClient(object, metaclass=Singleton):
             "MaxResult": max_result,
             "target": "{}/{}/0".format(blk_hash, tx_index)
         }
-        return self.debug.storage.make_request(post, data=data)
+        result = self.debug.storage.make_request(post, data=data)
+        if result is None:
+            return None
+        result["storage"] = thor_storage_convert_to_eth_storage(result["storage"])
+        return result
 
     def get_accounts(self):
         return self.account_manager.get_accounts()

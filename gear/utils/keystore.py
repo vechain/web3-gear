@@ -12,8 +12,8 @@ from Crypto.Hash import (
 from gear.utils.types import (
     encode_hex,
     decode_hex,
-    big_endian_to_int,
-    add_0x)
+    big_endian_to_int
+)
 
 
 PBKDF2_CONSTANTS = {
