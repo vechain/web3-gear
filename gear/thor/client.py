@@ -10,6 +10,7 @@ from gear.utils.compat import (
     thor_receipt_convert_to_eth_receipt,
     thor_tx_convert_to_eth_tx,
     thor_log_convert_to_eth_log,
+    thor_storage_convert_to_eth_storage,
     ThorTransaction,
     intrinsic_gas,
 )
@@ -33,20 +34,33 @@ class ThorClient(object, metaclass=Singleton):
         self.blocks = restful.blocks
         self.accounts = restful.accounts
         self.events = restful.events
+        self.debug = restful.debug
 
     def set_accounts(self, account_manager):
         self.account_manager = account_manager
 
-    def trace_transaction(self, tx_hash, params):
-        if "fullStorage" in params:  # this option is not supported in thor.
-            del params["fullStorage"]
+    def trace_transaction(self, tx_hash):
+        tx = self.transactions(tx_hash).make_request(get)
+        if tx is None:
+            return None
         data = {
-            "logConfig": params,
+            "name": "",
+            "target": "{}/{}/0".format(tx["meta"]["blockID"], tx_hash)
         }
-        return self.transactions(tx_hash).trace.make_request(post, data=data)
+        return self.debug.tracers.make_request(post, data=data)
 
-    def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start):
-        raise Exception("Did not implement this interface.")
+    def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start, max_result):
+        data = {
+            "ContractAddress": contract_addr,
+            "KeyStart": key_start,
+            "MaxResult": max_result,
+            "target": "{}/{}/0".format(blk_hash, tx_index)
+        }
+        result = self.debug.storage.make_request(post, data=data)
+        if result is None:
+            return None
+        result["storage"] = thor_storage_convert_to_eth_storage(result["storage"])
+        return result
 
     def get_accounts(self):
         return self.account_manager.get_accounts()

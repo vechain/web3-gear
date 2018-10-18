@@ -81,13 +81,13 @@ def rpc_modules():
 @dispatcher.add_method
 def debug_traceTransaction(tx_hash, params):
     logger.info('debug_traceTransaction')
-    return thor.trace_transaction(tx_hash, params)
+    return thor.trace_transaction(tx_hash)
 
 
 @dispatcher.add_method
-def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start):
+def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_result):
     logger.info('debug_storageRangeAt')
-    return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start)
+    return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start, max_result)
 
 
 #

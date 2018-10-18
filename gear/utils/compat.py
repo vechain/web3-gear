@@ -7,9 +7,11 @@ from rlp.sedes import (
     big_endian_int,
     binary
 )
+from .keystore import sha3
 from .types import (
     bytearray_to_bytestr,
     decode_hex,
+    encode_hex,
     encode_number,
     strip_0x
 )
@@ -119,6 +121,17 @@ def thor_tx_convert_to_eth_tx(tx):
         "gas": encode_number(tx["gas"]),
         "gasPrice": encode_number(1),
         "input": tx["clauses"][0]["data"]
+    }
+
+
+#
+# storage
+#
+def thor_storage_convert_to_eth_storage(storage):
+    def _convert_hash(key): return "0x{}".format(encode_hex(sha3(to_bytes(hexstr=key))))
+    return {
+        _convert_hash(v["key"]): v
+        for _, v in storage.items()
     }
 
 
