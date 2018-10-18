@@ -13,7 +13,7 @@ with open(path.join(here, "README.rst"), encoding="utf-8") as f:
 
 setup(
     name="web3-gear",
-    version="1.0.10",
+    version="1.1.0",
     description="An adapter between thor-restful and eth-rpc.",
     long_description=long_description,
     url="https://github.com/vechain/web3-gear",
