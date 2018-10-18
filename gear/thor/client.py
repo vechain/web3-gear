@@ -51,12 +51,12 @@ class ThorClient(object, metaclass=Singleton):
 
     def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start, max_result):
         data = {
-            "ContractAddress": contract_addr,
+            "Address": contract_addr,
             "KeyStart": key_start,
             "MaxResult": max_result,
             "target": "{}/{}/0".format(blk_hash, tx_index)
         }
-        result = self.debug.storage.make_request(post, data=data)
+        result = self.debug("storage-range").make_request(post, data=data)
         if result is None:
             return None
         result["storage"] = thor_storage_convert_to_eth_storage(result["storage"])
