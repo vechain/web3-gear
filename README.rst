@@ -28,6 +28,19 @@ On OS x
 
     pip3 install web3-gear
 
+On Ubuntu
+:::::::::
+
+* Python 3.6+ support
+
+1. Install the system-dependecies::
+
+    sudo apt-get install openssl
+
+2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
+
+    pip3 install web3-gear
+
 On Window
 :::::::::
 
