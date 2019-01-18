@@ -23,6 +23,8 @@ On OS x
 1. Install the system-dependecies::
 
     brew install openssl
+    export CFLAGS="-I$(brew --prefix openssl)/include $CFLAGS"
+    export LDFLAGS="-L$(brew --prefix openssl)/lib $LDFLAGS"
 
 2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
@@ -35,7 +37,7 @@ On Ubuntu
 
 1. Install the system-dependecies::
 
-    sudo apt-get install openssl
+    sudo apt-get install build-essential libssl-dev python-dev
 
 2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
