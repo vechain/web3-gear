@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 import traceback
-from jsonrpc import JSONRPCResponseManager, dispatcher
+from jsonrpc import JSONRPCResponseManager, Dispatcher
 from werkzeug.wrappers import Request, Response
 from .thor.client import thor
 from .utils.compat import noop
@@ -17,9 +17,25 @@ from .utils.types import (
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(levelname)s - %(name)s[line:%(lineno)d] - received rpc request - %(message)s',
+    format='received rpc request - %(message)s',
 )
 logger = logging.getLogger(__name__)
+
+
+class RichDispatcher(Dispatcher):
+    """
+    输出 Method not found 错误信息
+    """
+
+    def __getitem__(self, key):
+        logInfo = key
+        if key not in self.method_map:
+            logInfo = "{}, but method not found".format(key)
+        logger.info(logInfo)
+        return self.method_map[key]
+
+
+dispatcher = RichDispatcher()
 
 
 #
@@ -80,13 +96,11 @@ def rpc_modules():
 #
 @dispatcher.add_method
 def debug_traceTransaction(tx_hash, params):
-    logger.info('debug_traceTransaction')
     return thor.trace_transaction(tx_hash)
 
 
 @dispatcher.add_method
 def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_result):
-    logger.info('debug_storageRangeAt')
     return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start, max_result)
 
 
@@ -95,7 +109,7 @@ def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_resul
 #
 @dispatcher.add_method
 def net_version():
-    return 1
+    return 5777
 
 
 @dispatcher.add_method
@@ -134,33 +148,45 @@ def web3_clientVersion():
 # eth_api
 #
 @dispatcher.add_method
+def eth_getStorageAt(address, position, block_identifier="best"):
+    if position.startswith("0x"):
+        position = position[2:]
+    position = "0x{}".format(position.zfill(64))
+    return thor.get_storage_at(
+        address, position, normalize_block_identifier(block_identifier))
+
+
+@dispatcher.add_method
+def eth_getTransactionCount(address, block_identifier="best"):
+    '''
+    ethereum 用来处理 nonce, Thor 不需要
+    '''
+    return encode_number(0)
+
+
+@dispatcher.add_method
 def eth_accounts():
-    logger.info('eth_accounts')
     return thor.get_accounts()
 
 
 @dispatcher.add_method
 def eth_getCode(address, block_identifier="best"):
-    logger.info('eth_getCode')
     return thor.get_code(address, normalize_block_identifier(block_identifier))
 
 
 @dispatcher.add_method
 def eth_blockNumber():
-    logger.info('eth_blockNumber')
     return encode_number(thor.get_block_number())
 
 
 @dispatcher.add_method
 def eth_estimateGas(transaction):
-    logger.info('eth_estimateGas')
     formatted_transaction = input_transaction_formatter(transaction)
     return encode_number(thor.estimate_gas(formatted_transaction))
 
 
 @dispatcher.add_method
 def eth_call(transaction, block_identifier="best"):
-    logger.info('eth_call')
     formatted_transaction = input_transaction_formatter(transaction)
     return thor.call(formatted_transaction, normalize_block_identifier(block_identifier))
 
@@ -170,20 +196,17 @@ def eth_sendTransaction(transaction):
     '''
     发送未签名的交易
     '''
-    logger.info('eth_sendTransaction')
     formatted_transaction = input_transaction_formatter(transaction)
     return thor.send_transaction(formatted_transaction)
 
 
 @dispatcher.add_method
 def eth_getBalance(address, block_identifier="best"):
-    logger.info('eth_getBalance')
     return thor.get_balance(address, normalize_block_identifier(block_identifier))
 
 
 @dispatcher.add_method
 def eth_getTransactionByHash(tx_hash):
-    logger.info('eth_getTransactionByHash')
     try:
         return thor.get_transaction_by_hash(tx_hash)
     except Exception:
@@ -193,7 +216,6 @@ def eth_getTransactionByHash(tx_hash):
 
 @dispatcher.add_method
 def eth_getTransactionReceipt(tx_hash):
-    logger.info('eth_getTransactionReceipt')
     try:
         return thor.get_transaction_receipt(tx_hash)
     except Exception:
@@ -203,44 +225,39 @@ def eth_getTransactionReceipt(tx_hash):
 
 @dispatcher.add_method
 def eth_getBlockByHash(block_hash, full_tx=False):
-    logger.info('eth_getBlockByHash')
     return get_block(block_hash, full_tx)
 
 
 @dispatcher.add_method
 def eth_getBlockByNumber(block_number, full_tx=False):
-    logger.info('eth_getBlockByNumber')
     return get_block(block_number, full_tx)
 
 
 def get_block(block_identifier, full_tx):
     blk = thor.get_block(normalize_block_identifier(block_identifier))
     if blk and full_tx:
-        blk["transactions"] = [eth_getTransactionByHash(tx) for tx in blk["transactions"]]
+        blk["transactions"] = [eth_getTransactionByHash(
+            tx) for tx in blk["transactions"]]
     return blk
 
 
 @dispatcher.add_method
 def eth_newBlockFilter():
-    logger.info('eth_newBlockFilter')
     return thor.new_block_filter()
 
 
 @dispatcher.add_method
 def eth_uninstallFilter(filter_id):
-    logger.info('eth_uninstallFilter')
     return thor.uninstall_filter(filter_id)
 
 
 @dispatcher.add_method
 def eth_getFilterChanges(filter_id):
-    logger.info('eth_getFilterChanges')
     return thor.get_filter_changes(filter_id)
 
 
 @dispatcher.add_method
 def eth_getLogs(filter_obj):
-    logger.info('eth_getLogs')
     return thor.get_logs(filter_obj.get("address", None), input_log_filter_formatter(filter_obj))
 
 

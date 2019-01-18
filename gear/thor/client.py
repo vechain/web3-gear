@@ -49,6 +49,14 @@ class ThorClient(object, metaclass=Singleton):
         }
         return self.debug.tracers.make_request(post, data=data)
 
+    def get_storage_at(self, address, position, block_identifier):
+        params = {
+            "revision": block_identifier
+        }
+        storage = self.accounts(address).storage(
+            position).make_request(get, params=params)
+        return _attribute(storage, "value")
+
     def storage_range_at(self, blk_hash, tx_index, contract_addr, key_start, max_result):
         data = {
             "Address": contract_addr,
@@ -59,7 +67,8 @@ class ThorClient(object, metaclass=Singleton):
         result = self.debug("storage-range").make_request(post, data=data)
         if result is None:
             return None
-        result["storage"] = thor_storage_convert_to_eth_storage(result["storage"])
+        result["storage"] = thor_storage_convert_to_eth_storage(
+            result["storage"])
         return result
 
     def get_accounts(self):
@@ -79,7 +88,8 @@ class ThorClient(object, metaclass=Singleton):
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
             "caller": transaction.get("from", None),
         }
-        result = self.accounts(transaction.get("to", None)).make_request(post, data=data)
+        result = self.accounts(transaction.get(
+            "to", None)).make_request(post, data=data)
         if result is None:
             return 0
         return int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction)
@@ -93,7 +103,8 @@ class ThorClient(object, metaclass=Singleton):
             "value": (encode_number(transaction.get("value", 0))).decode("utf-8"),
             "caller": transaction.get("from", None),
         }
-        result = self.accounts(transaction.get("to", None)).make_request(post, data=data, params=params)
+        result = self.accounts(transaction.get("to", None)).make_request(
+            post, data=data, params=params)
         return _attribute(result, "data")
 
     def send_transaction(self, transaction):
