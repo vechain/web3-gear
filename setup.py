@@ -28,7 +28,7 @@ setup(
     packages=find_packages("."),
     include_package_data=True,
     python_requires=">=3.6",
-    install_requires=[x.strip() for x in open('requirements')],
+    install_requires=[x.strip() for x in open('requirements.txt')],
     entry_points={
         "console_scripts": [
             "web3-gear=gear.cli:run_server",
