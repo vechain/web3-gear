@@ -13,10 +13,14 @@ script:
 - make sdist
 
 deploy:
-  provider: pypi
-  distributions: sdist bdist_wheel
-  user: hanxiao
-  password:
-    secure: OJM/l2z5Yvny5fkFSuBmHtYB8LimY1+pb2J6wQKwKgs+X/+is96LY2nB4gcN6Geyg9EMIav2gWPqYw+AZ4CBWY+XvopHUgIFriNxBPfKCENwsd6M/XsEyh80dsatQ/By/JqSvi9Zlq55JfmjnzHF6UsC1Pof4vhj8012/drYO7MjjbXhmlO8/7J+/e9LQ9KMw+ISpbb0QuqV4eSCKT4Mc+ZeDZ61KVL7QF7k6STlsUxs3q852NugKXrSKP17TochS7emijQZ+IhMJ48GILbnrwnHz7zpmGmQEi0G3A2huMCHZRbUFSk7yxqrQRdtn7WngLq+WbCdCH40YgmLCXNabCyxO7jstiKibyDmRiJKcxyV7p8xFB+pQR9vRCZMQCYU0DH/E9XFAl06GPMhuR5PwfT+MFEPsh4aOl2lokr5bfl9jOYRfyy5AIfksLGPzdV4QMxbDt8BYDAI7oBp7GmVSnjNI0vsVvlL8ppZKRJrxRM3ItIPjGjxrPGE4IuEMLgwMvZi0AxPOOXdsQl0Px0uEvogGenjrZJKUsJQPpTWp6WBvo/P9sJ263omPYRSjGreuUS9KNxibb3bu5qqeJZibNhhtvRQ7DvSslMYhhz5+A5rQderJFqPAyxica+kY/KgyVBoKPFMiEV0TKjX8acqqpHyOU1ChWpO/crWcVOYPIM=
-  on:
-    tags: true
+  - provider: pypi
+    distributions: sdist bdist_wheel
+    user: hanxiao
+    password:
+      secure: OJM/l2z5Yvny5fkFSuBmHtYB8LimY1+pb2J6wQKwKgs+X/+is96LY2nB4gcN6Geyg9EMIav2gWPqYw+AZ4CBWY+XvopHUgIFriNxBPfKCENwsd6M/XsEyh80dsatQ/By/JqSvi9Zlq55JfmjnzHF6UsC1Pof4vhj8012/drYO7MjjbXhmlO8/7J+/e9LQ9KMw+ISpbb0QuqV4eSCKT4Mc+ZeDZ61KVL7QF7k6STlsUxs3q852NugKXrSKP17TochS7emijQZ+IhMJ48GILbnrwnHz7zpmGmQEi0G3A2huMCHZRbUFSk7yxqrQRdtn7WngLq+WbCdCH40YgmLCXNabCyxO7jstiKibyDmRiJKcxyV7p8xFB+pQR9vRCZMQCYU0DH/E9XFAl06GPMhuR5PwfT+MFEPsh4aOl2lokr5bfl9jOYRfyy5AIfksLGPzdV4QMxbDt8BYDAI7oBp7GmVSnjNI0vsVvlL8ppZKRJrxRM3ItIPjGjxrPGE4IuEMLgwMvZi0AxPOOXdsQl0Px0uEvogGenjrZJKUsJQPpTWp6WBvo/P9sJ263omPYRSjGreuUS9KNxibb3bu5qqeJZibNhhtvRQ7DvSslMYhhz5+A5rQderJFqPAyxica+kY/KgyVBoKPFMiEV0TKjX8acqqpHyOU1ChWpO/crWcVOYPIM=
+    on:
+      tags: true
+  - provider: script
+    script: curl -X POST $DOCKER_TRIGGER
+    on:
+      tags: true
