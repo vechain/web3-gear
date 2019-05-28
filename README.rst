@@ -15,7 +15,7 @@ Quick Start
 Installation
 >>>>>>>>>>>>
 
-On OS x
+On OS X
 :::::::
 
 * Python 3.6+ support
@@ -43,7 +43,7 @@ On Ubuntu
 
     pip3 install web3-gear
 
-On Window
+On Windows
 :::::::::
 
 * Python 3.6 support
