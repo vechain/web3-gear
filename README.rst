@@ -39,9 +39,21 @@ On Ubuntu
 
     sudo apt-get install build-essential libssl-dev python-dev
 
-2. Installation of Web3-Gear and it's dependent Python packages via PyPI::
+2. Use a virtual environment to isolate your web3-gear project
+
+    python3 -m venv thor-venv
+    source thor-venv/bin/activate
+
+3. Installation of Web3-Gear and it's dependent Python packages via PyPI::
 
     pip3 install web3-gear
+
+Note that you can activate and deactivate your virtual environment now
+
+    source thor-venv/bin/activate
+    deactivate
+
+See https://docs.python.org/3/library/venv.html for more information
 
 On Windows
 :::::::::
