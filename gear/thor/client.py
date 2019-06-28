@@ -90,8 +90,8 @@ class ThorClient(object, metaclass=Singleton):
         }
         result = self.accounts(transaction.get(
             "to", None)).make_request(post, data=data)
-        if result is None:
-            return 0
+        if result is None or result["reverted"] is False:
+            raise ValueError("Gas estimation failed.")
         return int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction)
 
     def call(self, transaction, block_identifier):
@@ -110,8 +110,12 @@ class ThorClient(object, metaclass=Singleton):
     def send_transaction(self, transaction):
         tx = ThorTransaction(self, transaction)
         tx.sign(self.account_manager.get_priv_by_addr(transaction["from"]))
+        raw = "0x{}".format(encode_hex(rlp.encode(tx)))
+        return self.send_raw_transaction(raw)
+
+    def send_raw_transaction(self, raw):
         data = {
-            "raw": "0x{}".format(encode_hex(rlp.encode(tx)))
+            "raw": raw
         }
         result = self.transactions.make_request(post, data=data)
         return _attribute(result, "id")

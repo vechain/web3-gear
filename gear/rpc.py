@@ -201,6 +201,14 @@ def eth_sendTransaction(transaction):
 
 
 @dispatcher.add_method
+def eth_sendRawTransaction(raw):
+    '''
+    发送已签名的交易
+    '''
+    return thor.send_raw_transaction(raw)
+
+
+@dispatcher.add_method
 def eth_getBalance(address, block_identifier="best"):
     return thor.get_balance(address, normalize_block_identifier(block_identifier))
 
