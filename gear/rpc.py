@@ -1,10 +1,9 @@
 import itertools
-import json
+import functools
 import logging
 import sys
+import json
 import traceback
-from jsonrpc import JSONRPCResponseManager, Dispatcher
-from werkzeug.wrappers import Request, Response
 from .thor.client import thor
 from .utils.compat import noop
 from .utils.types import (
@@ -13,29 +12,21 @@ from .utils.types import (
     normalize_block_identifier,
     normalize_number
 )
+from jsonrpcserver import method
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='received rpc request - %(message)s',
-)
-logger = logging.getLogger(__name__)
-
-
-class RichDispatcher(Dispatcher):
-    """
-    输出 Method not found 错误信息
-    """
-
-    def __getitem__(self, key):
-        logInfo = key
-        if key not in self.method_map:
-            logInfo = "{}, but method not found".format(key)
-        logger.info(logInfo)
-        return self.method_map[key]
-
-
-dispatcher = RichDispatcher()
+def async_serialize(func):
+    @functools.wraps(func)
+    async def wrapper(*args, **kw):
+        try:
+            result = await func(*args, **kw)
+            if isinstance(result, str):
+                return result
+            return force_obj_to_text(result, True)
+        except Exception as e:
+            traceback.print_exc()
+            raise e
+    return wrapper
 
 
 #
@@ -82,8 +73,8 @@ def topics_formatter(eth_topics):
 #
 #
 #
-@dispatcher.add_method
-def rpc_modules():
+@method
+async def rpc_modules():
     return {
         "eth": "1.0",
         "net": "1.0",
@@ -94,26 +85,28 @@ def rpc_modules():
 #
 # debug
 #
-@dispatcher.add_method
-def debug_traceTransaction(tx_hash, params):
-    return thor.trace_transaction(tx_hash)
+@method
+@async_serialize
+async def debug_traceTransaction(tx_hash, params):
+    return await thor.trace_transaction(tx_hash)
 
 
-@dispatcher.add_method
-def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_result):
-    return thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start, max_result)
+@method
+@async_serialize
+async def debug_storageRangeAt(blk_hash, tx_index, contract_addr, key_start, max_result):
+    return await thor.storage_range_at(blk_hash, tx_index, contract_addr, key_start, max_result)
 
 
 #
 # net_api
 #
-@dispatcher.add_method
-def net_version():
+@method
+async def net_version():
     return 5777
 
 
-@dispatcher.add_method
-def net_listening():
+@method
+async def net_listening():
     return False
 
 
@@ -122,21 +115,21 @@ def net_listening():
 # 没有真实实现, 只是为了实现接口
 #
 
-@dispatcher.add_method
-def evm_snapshot():
+@method
+async def evm_snapshot():
     return encode_number(0)
 
 
-@dispatcher.add_method
-def evm_revert(snapshot_idx=None):
+@method
+async def evm_revert(snapshot_idx=None):
     return True
 
 
 #
 # web3
 #
-@dispatcher.add_method
-def web3_clientVersion():
+@method
+async def web3_clientVersion():
     from . import __version__
     return "Web3-Gear/" + __version__ + "/{platform}/python{v.major}.{v.minor}.{v.micro}".format(
         v=sys.version_info,
@@ -147,140 +140,134 @@ def web3_clientVersion():
 #
 # eth_api
 #
-@dispatcher.add_method
-def eth_getStorageAt(address, position, block_identifier="best"):
+@method
+@async_serialize
+async def eth_getStorageAt(address, position, block_identifier="best"):
     if position.startswith("0x"):
         position = position[2:]
     position = "0x{}".format(position.zfill(64))
-    return thor.get_storage_at(
+    return await thor.get_storage_at(
         address, position, normalize_block_identifier(block_identifier))
 
 
-@dispatcher.add_method
-def eth_getTransactionCount(address, block_identifier="best"):
+@method
+async def eth_getTransactionCount(address, block_identifier="best"):
     '''
     ethereum 用来处理 nonce, Thor 不需要
     '''
     return encode_number(0)
 
 
-@dispatcher.add_method
-def eth_accounts():
+@method
+async def eth_accounts():
     return thor.get_accounts()
 
 
-@dispatcher.add_method
-def eth_getCode(address, block_identifier="best"):
-    return thor.get_code(address, normalize_block_identifier(block_identifier))
+@method
+@async_serialize
+async def eth_getCode(address, block_identifier="best"):
+    return await thor.get_code(address, normalize_block_identifier(block_identifier))
 
 
-@dispatcher.add_method
-def eth_blockNumber():
-    return encode_number(thor.get_block_number())
+@method
+@async_serialize
+async def eth_blockNumber():
+    return encode_number(await thor.get_block_number())
 
 
-@dispatcher.add_method
-def eth_estimateGas(transaction):
+@method
+@async_serialize
+async def eth_estimateGas(transaction):
     formatted_transaction = input_transaction_formatter(transaction)
-    return encode_number(thor.estimate_gas(formatted_transaction))
+    return encode_number(await thor.estimate_gas(formatted_transaction))
 
 
-@dispatcher.add_method
-def eth_call(transaction, block_identifier="best"):
+@method
+@async_serialize
+async def eth_call(transaction, block_identifier="best"):
     formatted_transaction = input_transaction_formatter(transaction)
-    return thor.call(formatted_transaction, normalize_block_identifier(block_identifier))
+    return await thor.call(formatted_transaction, normalize_block_identifier(block_identifier))
 
 
-@dispatcher.add_method
-def eth_sendTransaction(transaction):
+@method
+@async_serialize
+async def eth_sendTransaction(transaction):
     '''
     发送未签名的交易
     '''
     formatted_transaction = input_transaction_formatter(transaction)
-    return thor.send_transaction(formatted_transaction)
+    return await thor.send_transaction(formatted_transaction)
 
 
-@dispatcher.add_method
-def eth_sendRawTransaction(raw):
+@method
+@async_serialize
+async def eth_sendRawTransaction(raw):
     '''
     发送已签名的交易
     '''
-    return thor.send_raw_transaction(raw)
+    return await thor.send_raw_transaction(raw)
 
 
-@dispatcher.add_method
-def eth_getBalance(address, block_identifier="best"):
-    return thor.get_balance(address, normalize_block_identifier(block_identifier))
+@method
+@async_serialize
+async def eth_getBalance(address, block_identifier="best"):
+    return await thor.get_balance(address, normalize_block_identifier(block_identifier))
 
 
-@dispatcher.add_method
-def eth_getTransactionByHash(tx_hash):
-    try:
-        return thor.get_transaction_by_hash(tx_hash)
-    except Exception:
-        traceback.print_exc()
-        return None
+@method
+@async_serialize
+async def eth_getTransactionByHash(tx_hash):
+    if tx_hash:
+        return await thor.get_transaction_by_hash(tx_hash)
+    return None
 
 
-@dispatcher.add_method
-def eth_getTransactionReceipt(tx_hash):
-    try:
-        return thor.get_transaction_receipt(tx_hash)
-    except Exception:
-        traceback.print_exc()
-        return None
+@method
+@async_serialize
+async def eth_getTransactionReceipt(tx_hash):
+    if tx_hash:
+        return await thor.get_transaction_receipt(tx_hash)
+    return None
 
 
-@dispatcher.add_method
-def eth_getBlockByHash(block_hash, full_tx=False):
-    return get_block(block_hash, full_tx)
+@method
+@async_serialize
+async def eth_getBlockByHash(block_hash, full_tx=False):
+    return await get_block(block_hash, full_tx)
 
 
-@dispatcher.add_method
-def eth_getBlockByNumber(block_number, full_tx=False):
-    return get_block(block_number, full_tx)
+@method
+@async_serialize
+async def eth_getBlockByNumber(block_number, full_tx=False):
+    return await get_block(block_number, full_tx)
 
 
-def get_block(block_identifier, full_tx):
-    blk = thor.get_block(normalize_block_identifier(block_identifier))
+async def get_block(block_identifier, full_tx):
+    blk = await thor.get_block(normalize_block_identifier(block_identifier))
     if blk and full_tx:
         blk["transactions"] = [eth_getTransactionByHash(
             tx) for tx in blk["transactions"]]
     return blk
 
 
-@dispatcher.add_method
-def eth_newBlockFilter():
+@method
+async def eth_newBlockFilter():
     return thor.new_block_filter()
 
 
-@dispatcher.add_method
-def eth_uninstallFilter(filter_id):
+@method
+@async_serialize
+async def eth_uninstallFilter(filter_id):
     return thor.uninstall_filter(filter_id)
 
 
-@dispatcher.add_method
-def eth_getFilterChanges(filter_id):
+@method
+@async_serialize
+async def eth_getFilterChanges(filter_id):
     return thor.get_filter_changes(filter_id)
 
 
-@dispatcher.add_method
-def eth_getLogs(filter_obj):
-    return thor.get_logs(filter_obj.get("address", None), input_log_filter_formatter(filter_obj))
-
-
-@Request.application
-def application(request):
-    response = JSONRPCResponseManager.handle(
-        request.data,
-        dispatcher,
-    )
-    response = Response(
-        json.dumps(force_obj_to_text(response.data, True)),
-        headers={
-            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
-            "Access-Control-Allow-Origin": "*",
-        },
-        mimetype='application/json',
-    )
-    return response
+@method
+@async_serialize
+async def eth_getLogs(filter_obj):
+    return await thor.get_logs(filter_obj.get("address", None), input_log_filter_formatter(filter_obj))

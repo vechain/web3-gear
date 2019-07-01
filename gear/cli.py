@@ -1,30 +1,29 @@
-import time
 import click
-import random
 import requests
-from .utils.thread import spawn
 from .thor.client import thor
 from .thor.account import (
     solo,
     keystore as _keystore,
 )
-from .rpc import (
-    application,
-    web3_clientVersion,
-)
-from wsgiref.simple_server import (
-    make_server,
-    WSGIRequestHandler,
-)
+from .rpc import web3_clientVersion
+from aiohttp import web
+from jsonrpcserver import async_dispatch
 
 
-class SilentWSGIRequestHandler(WSGIRequestHandler):
-    """
-    WSGIRequestHandler 会输出所有的 request info, 重写 log_request 以保持输出干净.
-    """
+res_headers = {
+    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+    "Access-Control-Allow-Origin": "*",
+    "Connection": "keep-alive",
+}
 
-    def log_request(self, code="-", size="-"):
-        return
+
+async def handle(request):
+    request = await request.text()
+    response = await async_dispatch(request, basic_logging=True)
+    if response.wanted:
+        return web.json_response(response.deserialized(), headers=res_headers, status=response.http_status)
+    else:
+        return web.Response(headers=res_headers, content_type="text/plain")
 
 
 @click.command()
@@ -66,22 +65,10 @@ def run_server(host, port, endpoint, keystore, passcode):
     else:
         thor.set_accounts(_keystore(keystore, passcode))
 
-    server = make_server(
-        host,
-        port,
-        application,
-        handler_class=SilentWSGIRequestHandler
-    )
-    spawn(server.serve_forever)
-
-    try:
-        while True:
-            time.sleep(random.random())
-    except KeyboardInterrupt:
-        try:
-            server.stop()
-        except AttributeError:
-            server.shutdown()
+    app = web.Application()
+    app.router.add_post("/", handle)
+    app.router.add_options("/", lambda r: web.Response(headers=res_headers))
+    web.run_app(app, host=host, port=port)
 
 
 if __name__ == '__main__':
