@@ -90,7 +90,7 @@ class ThorClient(object, metaclass=Singleton):
         }
         result = self.accounts(transaction.get(
             "to", None)).make_request(post, data=data)
-        if result is None or result["reverted"] is False:
+        if result is None or result["reverted"]:
             raise ValueError("Gas estimation failed.")
         return int(result["gasUsed"] * 1.2) + intrinsic_gas(transaction)
 
