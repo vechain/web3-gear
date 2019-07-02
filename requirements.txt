@@ -4,7 +4,6 @@ scrypt
 werkzeug
 aiohttp
 jsonrpcserver
-requests
 lru-dict
 eth-keys
 eth_utils
