@@ -12,8 +12,7 @@ from .types import (
     bytearray_to_bytestr,
     decode_hex,
     encode_hex,
-    encode_number,
-    strip_0x
+    encode_number
 )
 
 
@@ -160,9 +159,7 @@ class ThorTransaction(rlp.Serializable):
         ("Signature", binary),  # b""
     ]
 
-    def __init__(self, thor, eth_tx):
-        chain_tag = int(thor.get_block(0)["hash"][-2:], 16)
-        blk_ref = int(strip_0x(thor.get_block("best")["hash"])[:8], 16)
+    def __init__(self, chain_tag, blk_ref, eth_tx):
         receiver = b"" if "to" not in eth_tx else decode_hex(eth_tx["to"])
         clauses = [
             Clause(

@@ -2,8 +2,9 @@ pbkdf2
 pycryptodome
 scrypt
 werkzeug
-json-rpc
 requests
+aiohttp
+jsonrpcserver
 lru-dict
 eth-keys
 eth_utils
