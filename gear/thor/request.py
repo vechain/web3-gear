@@ -43,6 +43,6 @@ class Restful(object):
         except Exception as e:
             print("Thor-Restful server Err:")
             print(e)
-            print(response.content)
-            raise ValueError(response.content.decode().strip('\n'))
+            print(response.text())
+            raise ValueError(response.text().strip('\n'))
         return None
