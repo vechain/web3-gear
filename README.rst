@@ -84,6 +84,8 @@ You can change its default behavior with the following parameters:
 --endpoint  thor restful service endpoint, eg: ``--endpoint http://127.0.0.1:8669``
 --keystore  keystore file path, eg: ``--keystore /Users/(username)/keystore)``, default=thor stand-alone(solo) built-in accounts
 --passcode  passcode of keystore, eg: ``--passcode xxxxxxxx``
+--debug     bool default=false, whether to display debug logs, eg: ``--debug true``
+--log       bool default=false, whether to display rpc logs, eg: ``--log false``
 
 Use Remix
 >>>>>>>>>
