@@ -17,9 +17,9 @@ res_headers = {
 }
 
 
-async def handle(request):
+async def handle(request, logging=False, debug=False):
     request = await request.text()
-    response = await async_dispatch(request, basic_logging=True)
+    response = await async_dispatch(request, basic_logging=logging, debug=debug)
     if response.wanted:
         return web.json_response(response.deserialized(), headers=res_headers, status=response.http_status)
     else:
@@ -48,7 +48,17 @@ async def handle(request):
     "--passcode",
     default="",
 )
-def run_server(host, port, endpoint, keystore, passcode):
+@click.option(
+    "--log",
+    default=False,
+    type=bool,
+)
+@click.option(
+    "--debug",
+    default=False,
+    type=bool,
+)
+def run_server(host, port, endpoint, keystore, passcode, log, debug):
     try:
         response = requests.options(endpoint)
         response.raise_for_status()
@@ -66,7 +76,7 @@ def run_server(host, port, endpoint, keystore, passcode):
         thor.set_accounts(_keystore(keystore, passcode))
 
     app = web.Application()
-    app.router.add_post("/", handle)
+    app.router.add_post("/", lambda r: handle(r, log, debug))
     app.router.add_options("/", lambda r: web.Response(headers=res_headers))
     web.run_app(app, host=host, port=port)
 
