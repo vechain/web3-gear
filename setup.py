@@ -7,7 +7,7 @@ from setuptools import (
 
 
 here = path.abspath(path.dirname(__file__))
-with open(path.join(here, "README.rst"), encoding="utf-8") as f:
+with open(path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 
@@ -16,6 +16,7 @@ setup(
     version="2.0.0",
     description="An adapter between thor-restful and eth-rpc.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     url="https://github.com/vechain/web3-gear",
     author="Han Xiao",
     author_email="smallcpp@foxmail.com",
