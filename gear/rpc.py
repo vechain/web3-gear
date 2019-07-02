@@ -128,13 +128,17 @@ async def evm_revert(snapshot_idx=None):
 #
 # web3
 #
-@method
-async def web3_clientVersion():
+def make_version():
     from . import __version__
     return "Web3-Gear/" + __version__ + "/{platform}/python{v.major}.{v.minor}.{v.micro}".format(
         v=sys.version_info,
         platform=sys.platform,
     )
+
+
+@method
+async def web3_clientVersion():
+    return make_version()
 
 
 #

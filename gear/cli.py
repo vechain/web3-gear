@@ -5,7 +5,7 @@ from .thor.account import (
     solo,
     keystore as _keystore,
 )
-from .rpc import web3_clientVersion
+from .rpc import make_version
 from aiohttp import web
 from jsonrpcserver import async_dispatch
 
@@ -56,7 +56,7 @@ def run_server(host, port, endpoint, keystore, passcode):
         print("Unable to connect to Thor-Restful server.")
         return
 
-    print(web3_clientVersion())
+    print(make_version())
     print("Listening on %s:%s" % (host, port))
 
     thor.set_endpoint(endpoint)
