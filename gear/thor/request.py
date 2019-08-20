@@ -33,20 +33,18 @@ class Restful(object):
         }
         kwargs.setdefault('headers', headers)
         kwargs.setdefault('timeout', 10)
+        error = None
         try:
             response = await method(self._endpoint, params=params, data=data, **kwargs)
-            response.raise_for_status()
             return await response.json()
         except aiohttp.ClientConnectionError as e:
             print("Unable to connect to Thor-Restful server:")
-            print(e)
+            error = e
         except Exception as e:
-            print("Thor-Restful server Err:")
-            print(e)
             try:
                 text = await response.text()
-                print(text)
-                raise ValueError(text.strip('\n'))
+                error = Exception(text.strip('\n'))
             except:
-                raise e
-        return None
+                error = e
+        print("Thor-Restful server Err:")
+        raise error
