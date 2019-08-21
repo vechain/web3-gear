@@ -149,9 +149,10 @@ class ThorClient(object, metaclass=Singleton):
         code = await self.accounts(address).code.make_request(get, params=params)
         return _attribute(code, "code")
 
-    def new_block_filter(self):
+    async def new_block_filter(self):
         filter_id = "0x{}".format(uuid.uuid4().hex)
-        self.filter[filter_id] = BlockFilter(self)
+        current_block_num = await self.get_block_number()
+        self.filter[filter_id] = BlockFilter(current_block_num, self)
         return filter_id
 
     def uninstall_filter(self, filter_id):
@@ -159,9 +160,9 @@ class ThorClient(object, metaclass=Singleton):
             del self.filter[filter_id]
         return True
 
-    def get_filter_changes(self, filter_id):
+    async def get_filter_changes(self, filter_id):
         func = self.filter.get(filter_id, lambda: [])
-        return func()
+        return await func()
 
     async def get_logs(self, address, query):
         params = {
@@ -174,18 +175,21 @@ class ThorClient(object, metaclass=Singleton):
 
 class BlockFilter(object):
 
-    def __init__(self, client):
+    def __init__(self, current_block_num, client):
         super(BlockFilter, self).__init__()
-        self.current = client.get_block_number()
+        self.current = current_block_num
         self.client = client
 
-    def __call__(self):
+    async def __call__(self):
         result = []
-        best_num = self.client.get_block_number()
+        best_num = await self.client.get_block_number()
         if best_num:
             result = [
                 id
-                for id in map(self.client.get_block_id, range(self.current, best_num + 1))
+                for id in [
+                    await id
+                    for id in map(self.client.get_block_id, range(self.current, best_num + 1))
+                ]
                 if id is not None
             ]
             self.current = best_num + 1

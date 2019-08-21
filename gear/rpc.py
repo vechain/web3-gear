@@ -256,7 +256,7 @@ async def get_block(block_identifier, full_tx):
 
 @method
 async def eth_newBlockFilter():
-    return thor.new_block_filter()
+    return await thor.new_block_filter()
 
 
 @method
@@ -268,7 +268,7 @@ async def eth_uninstallFilter(filter_id):
 @method
 @async_serialize
 async def eth_getFilterChanges(filter_id):
-    return thor.get_filter_changes(filter_id)
+    return await thor.get_filter_changes(filter_id)
 
 
 @method
