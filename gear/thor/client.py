@@ -161,8 +161,8 @@ class ThorClient(object, metaclass=Singleton):
         return True
 
     async def get_filter_changes(self, filter_id):
-        func = self.filter.get(filter_id, lambda: [])
-        return await func()
+        func = self.filter.get(filter_id)
+        return await func() if func else []
 
     async def get_logs(self, address, query):
         params = {
