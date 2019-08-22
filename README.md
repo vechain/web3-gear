@@ -10,7 +10,7 @@ Working with [Thor Builtins](https://github.com/vechain/thor-builtins) will make
 
 ### On OS X
 
-* Python 3.6+ support
+* Python 3.7+ support
 
 1. Install the system-dependecies
 
@@ -28,7 +28,7 @@ Working with [Thor Builtins](https://github.com/vechain/thor-builtins) will make
 
 ### On Ubuntu
 
-* Python 3.6+ support
+* Python 3.7+ support
 
 1. Install the system-dependecies
 
@@ -60,7 +60,7 @@ See https://docs.python.org/3/library/venv.html for more information
 
 ### On Windows
 
-* Python 3.6 support
+* Python 3.7+ support
 
 1. Install Visual C++ Build Tools.
 
