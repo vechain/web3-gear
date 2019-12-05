@@ -249,7 +249,7 @@ async def eth_getBlockByNumber(block_number, full_tx=False):
 async def get_block(block_identifier, full_tx):
     blk = await thor.get_block(normalize_block_identifier(block_identifier))
     if blk and full_tx:
-        blk["transactions"] = [eth_getTransactionByHash(
+        blk["transactions"] = [await eth_getTransactionByHash(
             tx) for tx in blk["transactions"]]
     return blk
 
