@@ -53,7 +53,7 @@ def input_log_filter_formatter(filter_params):
         params_range["to"] = int(to_blk, 16)
     return {
         "range": params_range,
-        "criteriaSets": topics_formatter(filter_params.get("topics", []), filter_params.get("address"))
+        "criteriaSet": topics_formatter(filter_params.get("topics", []), filter_params.get("address"))
     }
 
 
