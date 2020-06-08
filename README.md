@@ -74,7 +74,7 @@ See https://docs.python.org/3/library/venv.html for more information
 
 ## Run
 
-Installing through pip will make the ``web3-gear`` command available on your machine (`must run thor client first.`)
+Installing through pip will make the ``web3-gear`` command available on your machine (a running [thor](https://github.com/vechain/thor) client is required)
 
 ```
 web3-gear
@@ -92,13 +92,11 @@ You can change its default behavior with the following parameters:
 - **debug**: bool default=false, whether to display debug logs, eg: `--debug true`
 - **log**: bool default=false, whether to display rpc logs, eg: `--log false`
 
-### Use Remix
+### Work with Remix
 
 Change the Remix environment to Web3 provide.
 
-![](http://oi64.tinypic.com/2u59gef.jpg)
-
-### Use Truffle
+### Work with Truffle
 
 * Truffle 4.0.6+ support
 

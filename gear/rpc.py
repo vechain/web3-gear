@@ -53,22 +53,33 @@ def input_log_filter_formatter(filter_params):
         params_range["to"] = int(to_blk, 16)
     return {
         "range": params_range,
-        "topicSets": topics_formatter(filter_params.get("topics", []))
+        "criteriaSet": topics_formatter(filter_params.get("topics", []), filter_params.get("address"))
     }
 
 
-def topics_formatter(eth_topics):
+def topics_formatter(eth_topics, address=None):
+    if (not eth_topics) and (not address):
+        return []
+
+    if (not eth_topics) and address:
+        return [{"address": address}]
+    
     if eth_topics:
         matrix = [x if isinstance(x, list) else [x] for x in eth_topics]
-        return [
+        temp_list = [
             {
                 "topic{}".format(index): topic
                 for index, topic in enumerate(e)
             }
             for e in itertools.product(*matrix)
         ]
-    return []
 
+        if not address:
+            return temp_list
+        else:
+            for item in temp_list:
+                item["address"] = address
+            return temp_list
 
 #
 #

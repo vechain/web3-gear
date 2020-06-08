@@ -34,7 +34,7 @@ class ThorClient(object, metaclass=Singleton):
         self.transactions = restful.transactions
         self.blocks = restful.blocks
         self.accounts = restful.accounts
-        self.events = restful.events
+        self.logs = restful.logs
         self.debug = restful.debug
 
     def set_accounts(self, account_manager):
@@ -165,10 +165,7 @@ class ThorClient(object, metaclass=Singleton):
         return await func() if func else []
 
     async def get_logs(self, address, query):
-        params = {
-            "address": address
-        }
-        logs = await self.events.make_request(post, data=query, params=params)
+        logs = await self.logs.event.make_request(post, data=query)
         result = thor_log_convert_to_eth_log(address, logs)
         return result
 
