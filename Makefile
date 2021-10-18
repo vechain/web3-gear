@@ -21,7 +21,7 @@ clean-pyc:
 
 release: clean
 	python3 setup.py sdist bdist_wheel
-	twine upload -r pypi dist/*
+	python3 -m twine upload -r pypi dist/*
 
 sdist: clean
 	python3 setup.py sdist bdist_wheel

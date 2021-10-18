@@ -1,3 +1,4 @@
+twine
 pbkdf2
 pycryptodome
 scrypt

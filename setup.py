@@ -13,7 +13,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="web3-gear",
-    version="2.1.0",
+    version="2.1.1",
     description="An adapter between thor-restful and eth-rpc.",
     long_description=long_description,
     long_description_content_type="text/markdown",
